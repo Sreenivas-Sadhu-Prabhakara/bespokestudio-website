@@ -20,7 +20,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 # CONFIG  — single source of truth for NAP + CTAs.
 # Anything marked REPLACE must be confirmed before publication.
 # ============================================================
-SITE_ORIGIN = "https://bespokestudio.in"   # REPLACE if final domain differs
+SITE_ORIGIN = "https://bespokestudio.co.in"   # canonical domain (confirmed 2026-07-10)
 
 BIZ = {
     "name": "BespokeStudio",
