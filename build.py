@@ -11,6 +11,7 @@ No third-party dependencies. Plain HTML/CSS/JS output (fast static, per PRD s18)
 
 import os
 import html
+import json
 from urllib.parse import quote
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -45,18 +46,22 @@ MAPS_QUERY = quote("BespokeStudio, " + ADDR_ONELINE)
 DIRECTIONS_URL = "https://www.google.com/maps/dir/?api=1&destination=" + MAPS_QUERY
 MAP_EMBED_URL = "https://www.google.com/maps?q=" + MAPS_QUERY + "&output=embed"
 
-# --- Google reviews (REAL). GBP already carries reviews + ratings. ---
-# Paste the live values below; leave blank to render the "read on Google" state.
-# Do NOT invent a rating or reviews — that violates PRD s20 (Compliance).
+# --- Google reviews (REAL). Reviews are fetched LIVE in the browser, never
+# baked into the HTML (Google Places policy forbids caching review content).
+# Do NOT invent a rating or reviews — that violates PRD s20 (Compliance). ---
 GOOGLE = {
-    "profile_url": "https://www.google.com/maps/search/?api=1&query=" + MAPS_QUERY,  # REPLACE with exact listing URL
-    "write_url": "",          # REPLACE with GBP "write a review" short link
-    "rating": "",             # e.g. "4.9"  — paste from live Google Business Profile
-    "review_count": "",       # e.g. "180"  — paste from live Google Business Profile
+    # Owner's live Google listing (the "Read reviews on Google" link + fallback).
+    "profile_url": "https://share.google/eGm642nOUGeRKLQ7e",
+    "write_url": "",          # optional: GBP "write a review" short link (falls back to profile_url)
 }
-# Verified reviews to display. Paste 6+ real reviews (with permission), each:
-#   {"quote": "...", "author": "First name / initial", "garment": "Custom suit · 2026"}
-REVIEWS = []  # empty -> section renders review-ready slots + a link to Google
+
+# --- Live Google reviews via the Maps JS `Place` class (client-side) ---
+# Both are read from the environment at BUILD time so no secret is committed.
+# Leave either unset -> the reviews page ships the static "Read on Google"
+# fallback only (no fabricated rating, no API call). See build.py header + spec.
+GMAPS_KEY = os.environ.get("GMAPS_KEY", "").strip()        # referrer-restricted browser key
+PLACE_ID  = os.environ.get("BSPK_PLACE_ID", "").strip()    # resolved ChIJ… (Place ID Finder); safe to store
+LIVE_REVIEWS = bool(GMAPS_KEY and PLACE_ID)
 
 # GA4 measurement id — leave blank to ship without loading gtag (events still buffer).
 GA4_ID = ""   # e.g. "G-XXXXXXXXXX"
@@ -155,46 +160,26 @@ def cta_band():
     )
 
 def reviews_block(context="home"):
-    """Renders verified-Google reviews. Uses real config; never fabricates."""
+    """Google reviews. On the reviews page, when a key + place_id are configured,
+    live rating/count/reviews are fetched in the browser (assets/js/reviews.js)
+    and rendered into #gr-live. Otherwise — and always on home — we show an honest
+    static link to the live Google profile (#gr-fallback). Nothing is fabricated;
+    review content is never baked into the HTML (Places caching policy)."""
     prof = GOOGLE["profile_url"]
-    # header badge
-    if GOOGLE["rating"] and GOOGLE["review_count"]:
-        badge = ('<div class="review__tag">Verified on Google</div>'
-                 '<div class="trust__n" style="margin-top:.6rem">%s <span style="color:var(--brass)">&#9733;</span></div>'
-                 '<div class="trust__k">%s Google reviews</div>' % (html.escape(GOOGLE["rating"]), html.escape(GOOGLE["review_count"])))
-    else:
-        badge = ('<div class="review__tag">Verified on Google</div>'
-                 '<p class="mt-1" style="max-width:32rem">Our customers rate us on Google. Read what they say about the fit, the fabric, and the finish — straight from the source.</p>')
 
-    read_btn = '<a class="btn btn--brass mt-2" href="%s" data-evt="direction_click" data-p-section="reviews" target="_blank" rel="noopener">%s Read our reviews on Google</a>' % (prof, icon("arrow"))
+    # Always-safe static block. Default-visible; the live widget hides it on success.
+    fallback = (
+        '<div id="gr-fallback">'
+        '<div class="review__tag">Verified on Google</div>'
+        '<p class="mt-1" style="max-width:34rem">Our customers rate us on Google. '
+        'Read what they say about the fit, the fabric, and the finish — straight from the source.</p>'
+        '<a class="btn btn--brass mt-2" href="%s" data-evt="direction_click" data-p-section="reviews" target="_blank" rel="noopener">%s Read our reviews on Google</a>'
+        '</div>' % (prof, icon("arrow"))
+    )
 
-    # cards
-    if REVIEWS:
-        cards = []
-        for r in REVIEWS[:6]:
-            cards.append(
-                '<figure class="review reveal"><div class="review__stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>'
-                '<blockquote class="review__q">%s</blockquote>'
-                '<figcaption class="review__meta">%s &middot; %s</figcaption></figure>'
-                % (html.escape(r["quote"]), html.escape(r.get("author", "Google reviewer")), html.escape(r.get("garment", "Verified Google review")))
-            )
-        cards_html = '<div class="reviews">%s</div>' % "".join(cards)
-        note = ""
-    else:
-        slots = []
-        slot_labels = ["Custom suit · executive wardrobe", "Wedding sherwani · groom",
-                       "Custom shirts · office", "Women's formal · blazer",
-                       "Premium fabric · Reid & Taylor", "Alteration & refit"]
-        for i, lab in enumerate(slot_labels, 1):
-            slots.append(
-                '<figure class="review reveal"><div class="review__stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>'
-                '<blockquote class="review__q" style="color:var(--ink-38)">Verified Google review — to be placed here.</blockquote>'
-                '<figcaption class="review__meta">Slot %02d &middot; %s</figcaption></figure>' % (i, html.escape(lab))
-            )
-        cards_html = '<div class="reviews">%s</div>' % "".join(slots)
-        note = ('<div class="notice"><strong>Build note.</strong> The Google Business Profile already carries reviews and ratings. '
-                'Paste 6+ real reviews (with the customer&rsquo;s permission) into <code>REVIEWS</code> in build.py, and the live rating + count into '
-                '<code>GOOGLE</code>. Until then, the section links out to the live Google profile — no reviews are invented.</div>')
+    # Live mount — reviews page only, and only when a key + place_id are set.
+    # Populated exclusively from real API data; hidden until proven.
+    live = '<div id="gr-live" hidden></div>' if (context == "page" and LIVE_REVIEWS) else ""
 
     return """
 <section class="section section--deep" id="reviews">
@@ -204,16 +189,14 @@ def reviews_block(context="home"):
         <span class="eyebrow">What customers say</span>
         <h2 class="section-title">Rated by the people who wear the work.</h2>
         %s
-        %s
       </div>
       <div class="split__media reveal" style="align-self:center">%s</div>
     </div>
     %s
-    %s
   </div>
-</section>""" % (badge, read_btn,
+</section>""" % (fallback,
                  plate("PL · 11", "Fitting room — mirror & finished suit", "Reserved for showroom photography", variant="dark", ratio="4 / 5"),
-                 cards_html, note)
+                 live)
 
 def trust_bar():
     cells = [
@@ -226,21 +209,18 @@ def trust_bar():
         '<div class="trust__cell"><div class="trust__n">%s</div><div class="trust__k">%s</div></div>' % (n, k)
         for n, k in cells
     )
-    # 5th cell — Google reviews (real). Shows rating if configured, else links out.
-    if GOOGLE["rating"]:
-        g = '<div class="trust__cell"><a href="%s" data-evt="direction_click" data-p-section="trust" target="_blank" rel="noopener" style="display:block"><div class="trust__n">%s <span style="color:var(--brass)">&#9733;</span></div><div class="trust__k">On Google &middot; read reviews</div></a></div>' % (GOOGLE["profile_url"], html.escape(GOOGLE["rating"]))
-    else:
-        g = '<div class="trust__cell"><a href="%s" data-evt="direction_click" data-p-section="trust" target="_blank" rel="noopener" style="display:block"><div class="trust__n">Google</div><div class="trust__k">Read our verified reviews &rarr;</div></a></div>' % GOOGLE["profile_url"]
+    # 5th cell — Google reviews. Links to the live profile (the rating itself is
+    # shown live only on the reviews page; never hardcoded here).
+    g = '<div class="trust__cell"><a href="%s" data-evt="direction_click" data-p-section="trust" target="_blank" rel="noopener" style="display:block"><div class="trust__n">Google</div><div class="trust__k">Read our verified reviews &rarr;</div></a></div>' % GOOGLE["profile_url"]
     return '<section class="trust"><div class="trust__grid">%s%s</div></section>' % (inner, g)
 
 # ============================================================
 # JSON-LD  (LocalBusiness / ClothingStore — Appendix A, extended)
 # ============================================================
 def json_ld(page_url):
+    # No aggregateRating: Google review content can't be cached into markup
+    # (Places policy), and self-serving review snippets are disallowed anyway.
     agg = ""
-    if GOOGLE["rating"] and GOOGLE["review_count"]:
-        agg = ',\n  "aggregateRating": {"@type": "AggregateRating", "ratingValue": "%s", "reviewCount": "%s"}' % (
-            GOOGLE["rating"], GOOGLE["review_count"])
     return """<script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -273,7 +253,19 @@ def json_ld(page_url):
 # ============================================================
 # PAGE SHELL
 # ============================================================
-def head(title, desc, canonical, depth=0):
+# Google Maps JS API bootstrap (official dynamic-library loader — loads nothing
+# until reviews.js first calls importLibrary). Emitted ONLY on the reviews page
+# and ONLY when LIVE_REVIEWS is on. Tokens are replaced with json.dumps() so the
+# values are safely encoded as JS string literals inside the <script>.
+GMAPS_LOADER = '''<script>
+  (g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})({
+    key: __GMAPS_KEY__,
+    v: "weekly",
+  });
+  window.BSPK_REVIEWS = { placeId: __PLACE_ID__, hasKey: true, profileUrl: __PROFILE_URL__ };
+</script>'''
+
+def head(title, desc, canonical, depth=0, reviews_page=False):
     base = "../" * depth
     ga = ""
     if GA4_ID:
@@ -283,6 +275,13 @@ def head(title, desc, canonical, depth=0):
     else:
         ga = "<!-- GA4: set GA4_ID in build.py to enable. Events buffer to dataLayer until then. -->"
     og_img = SITE_ORIGIN + "/assets/img/og-cover.png"
+    maps = ""
+    if reviews_page and LIVE_REVIEWS:
+        loader = (GMAPS_LOADER
+                  .replace("__GMAPS_KEY__", json.dumps(GMAPS_KEY))
+                  .replace("__PLACE_ID__", json.dumps(PLACE_ID))
+                  .replace("__PROFILE_URL__", json.dumps(GOOGLE["profile_url"])))
+        maps = loader + '\n<script src="%sassets/js/reviews.js?v=1" defer></script>' % base
     return """<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script>document.documentElement.classList.add('js')</script>
@@ -303,9 +302,11 @@ def head(title, desc, canonical, depth=0):
 <link rel="preconnect" href="https://www.google.com">
 <link rel="stylesheet" href="%(base)sassets/css/site.css">
 %(jsonld)s
-%(ga)s""" % {
+%(ga)s
+%(maps)s""" % {
         "title": html.escape(title), "desc": html.escape(desc), "canonical": canonical,
         "og_img": og_img, "base": base, "jsonld": json_ld(canonical), "ga": ga,
+        "maps": maps,
     }
 
 def header(active, depth=0):
@@ -419,7 +420,7 @@ def footer(depth=0):
         "dir": DIRECTIONS_URL, "profile": GOOGLE["profile_url"], "base": base,
     }
 
-def page(slug, title, desc, body, active, depth=0, service=None):
+def page(slug, title, desc, body, active, depth=0, service=None, reviews_page=False):
     canonical = SITE_ORIGIN + "/" + slug
     page_id = slug.replace("/", "-").replace(".html", "") or "home"
     svc_attr = ' data-service="%s"' % html.escape(service) if service else ""
@@ -437,7 +438,7 @@ def page(slug, title, desc, body, active, depth=0, service=None):
 %(dock)s
 </body>
 </html>""" % {
-        "head": head(title, desc, canonical, depth), "pid": page_id, "svc": svc_attr,
+        "head": head(title, desc, canonical, depth, reviews_page), "pid": page_id, "svc": svc_attr,
         "header": header(active, depth), "body": body, "footer": footer(depth), "dock": dock(),
     }
     return doc
@@ -894,7 +895,7 @@ def build_reviews():
     return page("reviews.html",
                 "Reviews — Rated on Google | BespokeStudio Basaveshwaranagar",
                 "Read verified Google reviews for BespokeStudio, the bespoke tailoring and Reid & Taylor fabric showroom in Basaveshwaranagar, Bengaluru.",
-                "".join(body), "reviews.html", depth=0, service="reviews")
+                "".join(body), "reviews.html", depth=0, service="reviews", reviews_page=True)
 
 # ============================================================
 # ABOUT
@@ -1141,6 +1142,129 @@ HEADERS = """/assets/*
   Cache-Control: public, max-age=0, must-revalidate
 """
 
+# Live Google reviews module (loaded on the reviews page only, via GMAPS_LOADER).
+# Fetches rating + count + up to 5 reviews with the Maps JS Place class and renders
+# them with the mandatory Google attribution. ANY failure / missing key -> it reveals
+# the static #gr-fallback block. Review content is NEVER cached into HTML.
+# NOTE: served from /assets/* (immutable 1-yr cache); the loader references it as
+# `reviews.js?v=1` — bump that ?v= in GMAPS_LOADER + here if you edit this module.
+REVIEWS_JS = r"""/* BespokeStudio - live Google reviews (Maps JS Place class).
+   Self-contained, no third-party widget. Renders ONLY live data.
+   On any failure / missing key -> reveals the static "Read on Google" block. */
+(function () {
+  "use strict";
+
+  var cfg = window.BSPK_REVIEWS || null;
+  var mount = document.getElementById("gr-live");
+  var fallback = document.getElementById("gr-fallback");
+
+  function showFallback() {
+    if (fallback) fallback.hidden = false;
+    if (mount) mount.hidden = true;
+  }
+  function showLive() {
+    if (fallback) fallback.hidden = true;
+    if (mount) mount.hidden = false;
+  }
+
+  // Hard preconditions. No key or no place id -> static link only.
+  if (!cfg || !cfg.placeId || !cfg.hasKey || !mount) { showFallback(); return; }
+
+  var STAR = "★", DIM = "☆";
+  function esc(s) {
+    return String(s == null ? "" : s)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+  }
+  function stars(n) {
+    n = Math.round(Number(n) || 0);
+    if (n < 0) n = 0; if (n > 5) n = 5;
+    var out = ""; for (var i = 0; i < n; i++) out += STAR;
+    for (var j = n; j < 5; j++) out += DIM;
+    return out;
+  }
+
+  function render(place) {
+    var rating = (typeof place.rating === "number") ? place.rating : null;
+    var count = (typeof place.userRatingCount === "number") ? place.userRatingCount : null;
+    var reviews = Array.isArray(place.reviews) ? place.reviews.slice(0, 5) : [];
+    var mapsUri = place.googleMapsURI || cfg.profileUrl || "#";
+
+    // Never render an empty/fabricated state: require at least the aggregate.
+    if (rating == null || count == null) { showFallback(); return; }
+
+    var head =
+      '<div class="gr-head">' +
+        '<div class="gr-score">' +
+          '<span class="gr-rating">' + esc(rating.toFixed(1)) + '</span>' +
+          '<span class="gr-stars" aria-hidden="true">' + stars(rating) + '</span>' +
+          '<span class="gr-count">' + esc(String(count)) + ' Google reviews</span>' +
+        '</div>' +
+        '<a class="gr-badge" href="' + esc(mapsUri) + '" target="_blank" rel="noopener noreferrer">' +
+          'Reviews from <strong>Google&nbsp;Maps</strong>' +
+        '</a>' +
+      '</div>';
+
+    var cards = "";
+    for (var i = 0; i < reviews.length; i++) {
+      var r = reviews[i] || {};
+      var a = r.authorAttribution || {};
+      var name = a.displayName || "Google user";
+      var uri = a.uri || mapsUri;
+      var photo = a.photoURI || "";
+      var when = r.relativePublishTimeDescription || "";
+      var text = (r.text || "").trim();
+      if (!text) continue; // some reviews are rating-only; skip empties
+
+      // Mandatory per-review author attribution: avatar + name + profile link.
+      var avatar = photo
+        ? '<img class="gr-av" src="' + esc(photo) + '" width="40" height="40" alt="" referrerpolicy="no-referrer" loading="lazy">'
+        : '<span class="gr-av gr-av--ph" aria-hidden="true">' + esc(name.charAt(0).toUpperCase()) + '</span>';
+
+      cards +=
+        '<figure class="review gr-card">' +
+          '<div class="gr-card__top">' +
+            '<a class="gr-author" href="' + esc(uri) + '" target="_blank" rel="noopener noreferrer">' +
+              avatar + '<span class="gr-name">' + esc(name) + '</span>' +
+            '</a>' +
+            '<span class="review__stars" aria-label="' + esc(r.rating) + ' out of 5">' + stars(r.rating) + '</span>' +
+          '</div>' +
+          '<blockquote class="review__q">' + esc(text) + '</blockquote>' +
+          '<figcaption class="review__meta">' +
+            (when ? esc(when) + ' &middot; ' : '') +
+            '<a href="' + esc(mapsUri) + '" target="_blank" rel="noopener noreferrer">View on Google Maps</a>' +
+          '</figcaption>' +
+        '</figure>';
+    }
+
+    if (!cards) { showFallback(); return; } // no usable review text -> degrade
+
+    mount.innerHTML = head + '<div class="reviews gr-grid">' + cards + '</div>';
+    showLive();
+  }
+
+  // Bootstrap: load the Maps JS API on demand, then fetch fields once.
+  async function run() {
+    try {
+      if (!(window.google && google.maps && google.maps.importLibrary)) {
+        showFallback(); return;
+      }
+      var lib = await google.maps.importLibrary("places");
+      var Place = lib.Place;
+      var place = new Place({ id: cfg.placeId });
+      await place.fetchFields({
+        fields: ["rating", "userRatingCount", "reviews", "googleMapsURI"]
+      });
+      render(place);
+    } catch (e) {
+      showFallback();
+    }
+  }
+
+  run();
+})();
+"""
+
 # ============================================================
 # WRITE
 # ============================================================
@@ -1170,11 +1294,14 @@ def main():
         write(slug, content)
 
     write("assets/img/favicon.svg", FAVICON)
+    write("assets/js/reviews.js", REVIEWS_JS)
     write("sitemap.xml", build_sitemap(list(pages.keys())))
     write("robots.txt", ROBOTS)
     write("_headers", HEADERS)
 
-    print("Built %d pages + sitemap + robots + favicon + _headers (Cloudflare Pages)" % len(pages))
+    live = "ON (key+place_id set)" if LIVE_REVIEWS else "off (static Google-link fallback)"
+    print("Built %d pages + sitemap + robots + favicon + reviews.js + _headers (Cloudflare Pages)" % len(pages))
+    print("  live Google reviews: %s" % live)
     for slug in pages:
         print("  ·", slug)
 

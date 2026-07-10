@@ -425,6 +425,27 @@ section { position: relative; }
 .review__meta { font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-38); margin-top: auto; }
 .review__tag { display: inline-block; font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--brass); border: 1px solid var(--ink-14); padding: 0.2rem 0.45rem; }
 
+/* live Google reviews (assets/js/reviews.js) — matches the spec-sheet voice */
+[hidden] { display: none !important; }
+.gr-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-top: 2.5rem; padding-bottom: 1.25rem; border-bottom: 1px solid var(--ink-14); }
+.gr-score { display: flex; align-items: baseline; gap: 0.65rem; flex-wrap: wrap; }
+.gr-rating { font-family: var(--mono); font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 500; letter-spacing: -0.01em; color: var(--ink); font-variant-numeric: tabular-nums; }
+.gr-stars { color: var(--brass); letter-spacing: 0.15em; font-size: 0.95rem; }
+.gr-count { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-52); }
+.gr-badge { font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-52); text-decoration: none; border: 1px solid var(--ink-14); padding: 0.4rem 0.65rem; white-space: nowrap; }
+.gr-badge:hover { color: var(--brass); border-color: var(--brass); }
+.gr-badge strong { color: var(--ink); font-weight: 600; }
+.gr-grid { margin-top: 1.75rem; }
+.gr-card__top { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; }
+.gr-author { display: inline-flex; align-items: center; gap: 0.6rem; text-decoration: none; color: var(--ink); min-width: 0; }
+.gr-av { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; flex: 0 0 auto; background: var(--ink-14); }
+.gr-av--ph { display: inline-flex; align-items: center; justify-content: center; background: var(--ink); color: var(--chalk); font-family: var(--mono); font-size: 1rem; }
+.gr-name { font-size: 0.9rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gr-author:hover .gr-name { color: var(--brass); }
+.gr-card .review__meta { text-transform: none; letter-spacing: 0.04em; }
+.gr-card .review__meta a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+.gr-card .review__meta a:hover { color: var(--brass); }
+
 .notice {
   border: 1px dashed var(--brass); background: color-mix(in srgb, var(--brass) 7%, var(--oat));
   padding: 1rem 1.25rem; font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.06em;
