@@ -23,29 +23,121 @@
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "ClothingStore",
-  "@id": "https://bespokestudio.co.in/#business",
-  "name": "BespokeStudio",
-  "description": "Premium bespoke tailoring and Reid & Taylor fabric showroom in Basaveshwaranagar, Bengaluru.",
-  "url": "https://bespokestudio.co.in/",
-  "telephone": "+91-80-4989-1288",
-  "email": "support@bespokestudio.in",
-  "priceRange": "$$$",
-  "image": "https://bespokestudio.co.in/assets/img/og-cover.png",
-  "address": {"@type": "PostalAddress", "streetAddress": "568, Chord Rd, 3rd Stage, Basaveshwar Nagar", "addressLocality": "Bengaluru", "addressRegion": "Karnataka", "postalCode": "560079", "addressCountry": "IN"},
-  "geo": {"@type": "GeoCoordinates", "latitude": 12.9942605, "longitude": 77.5392937},
-  "openingHoursSpecification": [
-    {"@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"], "opens": "11:00", "closes": "21:00"},
-    {"@type": "OpeningHoursSpecification", "dayOfWeek": "Sunday", "opens": "11:00", "closes": "19:00"}
-  ],
-  "areaServed": ["Basaveshwaranagar","Rajajinagar","Vijayanagar","Malleshwaram","Bengaluru"],
-  "hasOfferCatalog": {"@type": "OfferCatalog", "name": "Bespoke tailoring and premium fabrics", "itemListElement": [
-    {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Men's bespoke suits"}},
-    {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Custom shirts and trousers"}},
-    {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Sherwani and ethnic wear tailoring"}},
-    {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Women's formal bespoke clothing"}},
-    {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Premium fabric consultation"}}
-  ]}
+  "@graph": [
+    {
+      "@type": "ClothingStore",
+      "@id": "https://bespokestudio.co.in/#business",
+      "name": "BespokeStudio",
+      "description": "Bespoke tailoring atelier and premium fabric showroom in Basaveshwaranagar, Bengaluru, working with Reid & Taylor and other fine suiting cloths.",
+      "url": "https://bespokestudio.co.in/",
+      "telephone": "+91-80-4989-1288",
+      "email": "support@bespokestudio.in",
+      "priceRange": "$$$",
+      "image": "https://bespokestudio.co.in/assets/img/og-cover.png",
+      "sameAs": [
+        "https://share.google/eGm642nOUGeRKLQ7e"
+      ],
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "568, Chord Rd, 3rd Stage, Basaveshwar Nagar",
+        "addressLocality": "Bengaluru",
+        "addressRegion": "Karnataka",
+        "postalCode": "560079",
+        "addressCountry": "IN"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": 12.9942605,
+        "longitude": 77.5392937
+      },
+      "openingHoursSpecification": [
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday"
+          ],
+          "opens": "11:00",
+          "closes": "21:00"
+        },
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": "Sunday",
+          "opens": "11:00",
+          "closes": "19:00"
+        }
+      ],
+      "areaServed": [
+        "Basaveshwaranagar",
+        "Rajajinagar",
+        "Vijayanagar",
+        "Malleshwaram",
+        "Bengaluru"
+      ],
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Bespoke tailoring and premium fabrics",
+        "itemListElement": [
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Men's bespoke suits"
+            }
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Custom shirts and trousers"
+            }
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Sherwani and ethnic wear tailoring"
+            }
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Women's formal bespoke clothing"
+            }
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Premium fabric consultation"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://bespokestudio.co.in/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Fabrics",
+          "item": "https://bespokestudio.co.in/fabrics"
+        }
+      ]
+    }
+  ]
 }
 </script>
 <!-- GA4: set GA4_ID in build.py to enable. Events buffer to dataLayer until then. -->
@@ -106,8 +198,15 @@
         <p>We will show you the current lengths in the showroom and talk you through weight, weave, and season. Availability is always confirmed in person.</p>
         <div class="cta-row mt-3"><a class="btn btn--onink" href="https://wa.me/919900259407?text=Hello%20BespokeStudio%2C%20I%20would%20like%20to%20ask%20about%20Reid%20%26%20Taylor%20fabric%20availability." data-evt="whatsapp_click" data-p-service="fabrics" data-p-position="fabrics" target="_blank" rel="noopener"><svg class="btn__ic" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.5 14.4c-.3-.15-1.77-.87-2.04-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.48-.89-.79-1.49-1.77-1.66-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51l-.57-.01c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.88 1.22 3.08c.15.2 2.1 3.2 5.08 4.49.71.31 1.26.49 1.69.63.71.22 1.36.19 1.87.12.57-.09 1.77-.72 2.02-1.42.25-.7.25-1.3.17-1.42-.07-.12-.27-.2-.57-.35z"/><path d="M20.5 3.4A11.9 11.9 0 0012 0C5.4 0 .1 5.3.1 11.9c0 2.1.5 4.1 1.6 5.9L0 24l6.4-1.7c1.7.9 3.6 1.4 5.6 1.4h.01C18.6 23.7 24 18.4 24 11.8c0-3.2-1.2-6.2-3.5-8.4zM12 21.5h-.01a9.6 9.6 0 01-4.9-1.34l-.35-.2-3.7.97.99-3.6-.23-.37A9.55 9.55 0 012 11.9C2 6.4 6.5 1.9 12 1.9c2.6 0 5 1 6.8 2.8a9.5 9.5 0 012.8 6.7c0 5.5-4.5 10-9.6 10z"/></svg> Ask about fabric availability</a></div>
       </div>
-      <div class="split__media reveal"><figure class="plate " style="--ratio:4 / 3" role="img" aria-label="Photography plate — reserved for: Reid &amp; Taylor lengths on the wall"><span class="plate__mono">PL · 31</span><span class="plate__glyph">BS</span><figcaption class="plate__cap"><span class="plate__label">Reid &amp; Taylor lengths on the wall</span><span class="plate__note">Reserved for showroom photography</span></figcaption></figure></div>
+      <div class="split__media reveal"><figure class="swatch swatch--photo" style="--ratio:4 / 3"><img class="swatch__img" src="assets/img/rt/reid-and-taylor-heritage-tailoring.jpg" alt="Reid &amp; Taylor heritage tailoring" loading="lazy" decoding="async"><span class="swatch__edge" aria-hidden="true"></span><span class="swatch__tag">REID &amp; TAYLOR · HERITAGE</span></figure></div>
     </div>
+  </div>
+</section>
+<section class="section section--deep">
+  <div class="wrap">
+    <div class="sec-head reveal"><span class="eyebrow">The cloth, in hand</span><h2 class="section-title">A sample of the Reid &amp; Taylor wall.</h2>
+    <p>Genuine Reid &amp; Taylor Super 100s suiting &mdash; a few of the tones we cut most often. Handle the full range in the showroom.</p></div>
+    <div class="gallery mt-3"><figure class="swatch swatch--photo" style="--ratio:3 / 4"><img class="swatch__img" src="assets/img/rt/reid-and-taylor-suiting-fabric-navy-worsted.jpg" alt="Reid &amp; Taylor navy worsted suiting" loading="lazy" decoding="async"><span class="swatch__edge" aria-hidden="true"></span><span class="swatch__tag">NAVY · WORSTED</span></figure><figure class="swatch swatch--photo" style="--ratio:3 / 4"><img class="swatch__img" src="assets/img/rt/reid-and-taylor-suiting-fabric-charcoal.jpg" alt="Reid &amp; Taylor charcoal worsted suiting" loading="lazy" decoding="async"><span class="swatch__edge" aria-hidden="true"></span><span class="swatch__tag">CHARCOAL</span></figure><figure class="swatch swatch--photo" style="--ratio:3 / 4"><img class="swatch__img" src="assets/img/rt/reid-and-taylor-suiting-fabric-worsted-grey.jpg" alt="Reid &amp; Taylor worsted grey suiting" loading="lazy" decoding="async"><span class="swatch__edge" aria-hidden="true"></span><span class="swatch__tag">GREY</span></figure><figure class="swatch swatch--photo" style="--ratio:3 / 4"><img class="swatch__img" src="assets/img/rt/reid-and-taylor-suiting-fabric-irish-coffee-brown.jpg" alt="Reid &amp; Taylor irish-coffee brown twill" loading="lazy" decoding="async"><span class="swatch__edge" aria-hidden="true"></span><span class="swatch__tag">IRISH COFFEE</span></figure><figure class="swatch swatch--photo" style="--ratio:3 / 4"><img class="swatch__img" src="assets/img/rt/reid-and-taylor-suiting-fabric-navy-bolt.jpg" alt="A bolt of Reid &amp; Taylor navy suiting" loading="lazy" decoding="async"><span class="swatch__edge" aria-hidden="true"></span><span class="swatch__tag">ON THE BOLT</span></figure></div>
   </div>
 </section>
 <section class="section section--paper">
@@ -120,7 +219,7 @@
 <section class="section section--deep">
   <div class="wrap">
     <div class="split">
-      <div class="split__media reveal"><figure class="plate plate--chalk " style="--ratio:4 / 3" role="img" aria-label="Photography plate — reserved for: Swatches &amp; grain — macro"><span class="plate__mono">PL · 32</span><span class="plate__glyph">BS</span><figcaption class="plate__cap"><span class="plate__label">Swatches &amp; grain — macro</span><span class="plate__note">Reserved for fabric photography</span></figcaption></figure></div>
+      <div class="split__media reveal"><figure class="swatch swatch--photo" style="--ratio:4 / 3"><img class="swatch__img" src="assets/img/rt/reid-and-taylor-suiting-fabric-irish-coffee-brown.jpg" alt="Reid &amp; Taylor irish-coffee brown twill" loading="lazy" decoding="async"><span class="swatch__edge" aria-hidden="true"></span><span class="swatch__tag">IRISH COFFEE · TWILL</span></figure></div>
       <div class="split__body reveal">
         <span class="eyebrow">Care, briefly</span>
         <h2 class="section-title">Look after good cloth and it looks after you.</h2>
@@ -145,7 +244,7 @@
         <div class="cta-row"><a class="btn btn--wa" href="https://wa.me/919900259407?text=Hello%20BespokeStudio%2C%20I%20would%20like%20to%20book%20a%20wardrobe%20consultation." data-evt="whatsapp_click" data-p-position="section" target="_blank" rel="noopener"><svg class="btn__ic" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.5 14.4c-.3-.15-1.77-.87-2.04-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.48-.89-.79-1.49-1.77-1.66-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51l-.57-.01c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.88 1.22 3.08c.15.2 2.1 3.2 5.08 4.49.71.31 1.26.49 1.69.63.71.22 1.36.19 1.87.12.57-.09 1.77-.72 2.02-1.42.25-.7.25-1.3.17-1.42-.07-.12-.27-.2-.57-.35z"/><path d="M20.5 3.4A11.9 11.9 0 0012 0C5.4 0 .1 5.3.1 11.9c0 2.1.5 4.1 1.6 5.9L0 24l6.4-1.7c1.7.9 3.6 1.4 5.6 1.4h.01C18.6 23.7 24 18.4 24 11.8c0-3.2-1.2-6.2-3.5-8.4zM12 21.5h-.01a9.6 9.6 0 01-4.9-1.34l-.35-.2-3.7.97.99-3.6-.23-.37A9.55 9.55 0 012 11.9C2 6.4 6.5 1.9 12 1.9c2.6 0 5 1 6.8 2.8a9.5 9.5 0 012.8 6.7c0 5.5-4.5 10-9.6 10z"/></svg> WhatsApp us</a><a class="btn btn--onink" href="tel:+918049891288" data-evt="call_click" data-p-position="section"><svg class="btn__ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.4 3.5c.4 0 .78.28.9.66l.92 3.05a1 1 0 01-.26 1.02L6.7 9.55a13 13 0 006.6 6.6l1.32-1.26a1 1 0 011.02-.26l3.05.92c.38.12.66.5.66.9v3.05a1.5 1.5 0 01-1.62 1.5A16.5 16.5 0 013.6 5.12 1.5 1.5 0 015.1 3.5z"/></svg> Call 080 4989 1288</a><a class="btn btn--onink" href="https://www.google.com/maps/dir/?api=1&destination=BespokeStudio%2C%20568%2C%20Chord%20Rd%2C%203rd%20Stage%2C%20Basaveshwar%20Nagar%2C%20Bengaluru%2C%20Karnataka%20560079" data-evt="direction_click" data-p-position="section" target="_blank" rel="noopener"><svg class="btn__ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s6.5-5.8 6.5-11a6.5 6.5 0 10-13 0C5.5 15.2 12 21 12 21z"/><circle cx="12" cy="10" r="2.4"/></svg> Directions</a></div>
       </div>
       <div class="split__media reveal">
-        <figure class="plate " style="--ratio:16 / 10" role="img" aria-label="Photography plate — reserved for: Consultation table — fabric bunch &amp; measure card"><span class="plate__mono">PL · 09</span><span class="plate__glyph">BS</span><figcaption class="plate__cap"><span class="plate__label">Consultation table — fabric bunch &amp; measure card</span><span class="plate__note">Reserved for showroom photography</span></figcaption></figure>
+        <figure class="swatch swatch--camel" style="--ratio:16 / 10" role="img" aria-label="Consultation table — fabric bunch &amp; measure card"><span class="swatch__weave" aria-hidden="true"></span><span class="swatch__edge" aria-hidden="true"></span><svg class="crest swatch__crest" aria-hidden="true" viewBox="0 0 100 118" role="img" aria-labelledby="crestT" xmlns="http://www.w3.org/2000/svg" fill="none"><title id="crestT">BespokeStudio</title><path d="M50 4 88 17.5v40.5c0 30-18.5 45.5-38 53.5C30.5 103.5 12 88 12 58V17.5L50 4Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M50 12 80 22.5v35.5c0 25-14.5 38-30 44.5C34.5 96 20 83 20 58V22.5L50 12Z" stroke="currentColor" stroke-width="1" stroke-linejoin="round" opacity=".5"/><g fill="currentColor"><path d="M34 42h11.4c4.4 0 7.3 2.2 7.3 5.9 0 2.6-1.6 4.4-3.9 5.1 2.9.5 4.9 2.6 4.9 5.7 0 4.1-3.1 6.6-8 6.6H34V42Zm10.4 9.4c2 0 3.2-1.1 3.2-2.8 0-1.7-1.2-2.6-3.3-2.6h-5.2v5.4h5.3Zm.5 9.3c2.2 0 3.5-1.1 3.5-3 0-1.9-1.4-2.9-3.6-2.9h-5.7v5.9h5.8Z"/><path d="M56.7 59.6c.2 2.4 2.1 3.9 5 3.9 2.5 0 4.1-1.1 4.1-2.8 0-1.5-1-2.2-3.8-2.8l-2.5-.6c-4.1-.9-6-2.9-6-6 0-3.9 3.2-6.4 7.9-6.4 4.9 0 7.8 2.4 8 6.4h-4.7c-.2-2-1.5-3-3.4-3-1.9 0-3.2.9-3.2 2.4 0 1.3 1 2 3.4 2.6l2.6.6c4.3.9 6.2 2.7 6.2 6 0 4.1-3.3 6.7-8.7 6.7-5.3 0-8.6-2.5-8.8-6.6l3.9-.4Z"/></g><path d="M27 74c9-2.6 37-2.6 46 0" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M24.4 74c-2.4.7-4 2.4-4.4 4.7M75.6 74c2.4.7 4 2.4 4.4 4.7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" opacity=".7"/><circle cx="50" cy="30" r="1.6" fill="currentColor"/></svg><span class="swatch__tag">OAT · CAMEL</span></figure>
       </div>
     </div>
   </div>
@@ -176,7 +275,7 @@
         </address>
       </div>
     </div>
-    <p class="footer__note">BespokeStudio · Reid & Taylor, Basaveshwaranagar. Reid &amp; Taylor is referenced as a premium fabric house; fabric availability is confirmed at the showroom. Indicative delivery is one to two weeks with express work on request. Pricing depends on fabric, garment type, finish, and timeline — please WhatsApp us for a consultation.</p>
+    <p class="footer__note">BespokeStudio, bespoke tailors in Basaveshwaranagar, Bengaluru. Reid &amp; Taylor is referenced as a premium fabric house; fabric availability is confirmed at the showroom. Indicative delivery is one to two weeks with express work on request. Pricing depends on fabric, garment type, finish, and timeline — please WhatsApp us for a consultation.</p>
     <div class="footer__bar">
       <span>&copy; <span data-year>2026</span> BespokeStudio &middot; Basaveshwaranagar</span>
       <span><a href="https://www.google.com/maps/dir/?api=1&destination=BespokeStudio%2C%20568%2C%20Chord%20Rd%2C%203rd%20Stage%2C%20Basaveshwar%20Nagar%2C%20Bengaluru%2C%20Karnataka%20560079" data-evt="direction_click" data-p-position="footer" target="_blank" rel="noopener">Get directions</a> &middot; <a href="https://share.google/eGm642nOUGeRKLQ7e" target="_blank" rel="noopener">Google profile</a></span>

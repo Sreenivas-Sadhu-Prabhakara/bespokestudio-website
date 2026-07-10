@@ -24,7 +24,7 @@ SITE_ORIGIN = "https://bespokestudio.co.in"   # canonical domain (confirmed 2026
 
 BIZ = {
     "name": "BespokeStudio",
-    "legal_note": "BespokeStudio · Reid & Taylor, Basaveshwaranagar",  # brand-architecture line (PRD s3)
+    "legal_note": "BespokeStudio, bespoke tailors in Basaveshwaranagar, Bengaluru",  # single business NAME line (Reid & Taylor is framed as a fabric house in the sentence that follows in footer())
     "street": "568, Chord Rd, 3rd Stage, Basaveshwar Nagar",
     "locality": "Bengaluru",
     "region": "Karnataka",
@@ -104,24 +104,82 @@ NAV = [
 # ============================================================
 # COMPONENTS
 # ============================================================
+### These three module-level additions go DIRECTLY ABOVE the new plate() function
+### (i.e. they replace the old plate()'s position — the build_edits below swap the
+### old def plate(...) body for the new one, and prepend these constants). CREST_SVG
+### is also reused small in header/footer if desired by swapping the class + color.
+
+# A curated fabric SWATCH replaces the old photography placeholder. The debossed
+# monogram crest (currentColor, so CSS recolors it per cloth tone) is an original
+# tailor's mark: a hairline shield around a serif BS with a needle-and-thread swoop.
+CREST_SVG = '<svg class="crest" viewBox="0 0 100 118" role="img" aria-labelledby="crestT" xmlns="http://www.w3.org/2000/svg" fill="none"><title id="crestT">BespokeStudio</title><path d="M50 4 88 17.5v40.5c0 30-18.5 45.5-38 53.5C30.5 103.5 12 88 12 58V17.5L50 4Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M50 12 80 22.5v35.5c0 25-14.5 38-30 44.5C34.5 96 20 83 20 58V22.5L50 12Z" stroke="currentColor" stroke-width="1" stroke-linejoin="round" opacity=".5"/><g fill="currentColor"><path d="M34 42h11.4c4.4 0 7.3 2.2 7.3 5.9 0 2.6-1.6 4.4-3.9 5.1 2.9.5 4.9 2.6 4.9 5.7 0 4.1-3.1 6.6-8 6.6H34V42Zm10.4 9.4c2 0 3.2-1.1 3.2-2.8 0-1.7-1.2-2.6-3.3-2.6h-5.2v5.4h5.3Zm.5 9.3c2.2 0 3.5-1.1 3.5-3 0-1.9-1.4-2.9-3.6-2.9h-5.7v5.9h5.8Z"/><path d="M56.7 59.6c.2 2.4 2.1 3.9 5 3.9 2.5 0 4.1-1.1 4.1-2.8 0-1.5-1-2.2-3.8-2.8l-2.5-.6c-4.1-.9-6-2.9-6-6 0-3.9 3.2-6.4 7.9-6.4 4.9 0 7.8 2.4 8 6.4h-4.7c-.2-2-1.5-3-3.4-3-1.9 0-3.2.9-3.2 2.4 0 1.3 1 2 3.4 2.6l2.6.6c4.3.9 6.2 2.7 6.2 6 0 4.1-3.3 6.7-8.7 6.7-5.3 0-8.6-2.5-8.8-6.6l3.9-.4Z"/></g><path d="M27 74c9-2.6 37-2.6 46 0" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M24.4 74c-2.4.7-4 2.4-4.4 4.7M75.6 74c2.4.7 4 2.4 4.4 4.7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" opacity=".7"/><circle cx="50" cy="30" r="1.6" fill="currentColor"/></svg>'
+
+# cloth tones cycled across the page, in bolt order (module-global counter increments
+# per swatch so a page reads as a curated run of bolts, not one repeated tone).
+_SWATCH_TONES = ["worsted", "midnight", "oxblood", "camel", "ink"]
+_swatch_i = 0
+# short, honest fabric codes per tone (mono tag) — a cloth code, NOT a photo caption.
+# HTML-safe (&amp;) because the tag is inserted verbatim into markup.
+_SWATCH_TAGS = {
+    "worsted":  "R&amp;T · WORSTED",
+    "midnight": "MIDNIGHT · 12OZ",
+    "oxblood":  "OXBLOOD · TWILL",
+    "camel":    "OAT · CAMEL",
+    "ink":      "INK · WORSTED",
+}
+
 def plate(code, label, note, variant="dark", ratio=None, glyph="BS", cls=""):
-    """Art-directed photography placeholder — signals the exact shot to capture."""
-    # normalise any pre-escaped entities (labels may contain "&amp;") so
-    # html.escape() below doesn't double-escape into a literal "&amp;amp;"
-    code, label, note = html.unescape(code), html.unescape(label), html.unescape(note)
-    style = ' style="--ratio:%s"' % ratio if ratio else ""
-    vcls = " plate--chalk" if variant == "chalk" else ""
-    aria = "Photography plate — reserved for: %s" % label
+    """Curated fabric SWATCH — a CSS-woven cloth field with a debossed monogram crest.
+    Replaces the old photography placeholder; signature preserved so no call site changes.
+      code    -> IGNORED (was the 'PL · NN' plate ref — a placeholder tell)
+      label   -> real human text used only as the a11y aria-label (never rendered)
+      note    -> IGNORED (was 'Reserved for … photography' — a placeholder tell)
+      variant -> IGNORED for colour; the old dark/chalk/tag values don't map to cloth
+                 tones, so tones are cycled deterministically instead
+      ratio   -> passed through as --ratio (4/3, 3/4, 1/1, 3/2, 16/10); ignored in fill mode
+      glyph   -> IGNORED (the crest is a fixed SVG)
+      cls     -> passed through; 'plate--fill' is normalised to 'swatch--fill', so layout
+                 classes like g-span-2 survive untouched (gallery grid + hero fill unchanged)
+    Google reviews plumbing (.gr-*, #gr-live/#gr-fallback, reviews.js) is not referenced.
+    """
+    global _swatch_i
+    tone = _SWATCH_TONES[_swatch_i % len(_SWATCH_TONES)]
+    _swatch_i += 1
+
+    label = html.unescape(label or "")
+    aria = html.escape(label) if label else "BespokeStudio fabric swatch"
+    tag = _SWATCH_TAGS[tone]
+
+    # normalise the old fill class name; carry any layout classes (e.g. g-span-2)
+    cls = (cls or "").replace("plate--fill", "swatch--fill")
+    fill = "swatch--fill" in cls
+    extra = (" " + cls.strip()) if cls.strip() else ""
+    style = "" if (fill or not ratio) else ' style="--ratio:%s"' % ratio
+    crest = CREST_SVG.replace('class="crest"', 'class="crest swatch__crest" aria-hidden="true"', 1)
+
     return (
-        '<figure class="plate%s %s"%s role="img" aria-label="%s">'
-        '<span class="plate__mono">%s</span>'
-        '<span class="plate__glyph">%s</span>'
-        '<figcaption class="plate__cap">'
-        '<span class="plate__label">%s</span>'
-        '<span class="plate__note">%s</span>'
-        '</figcaption></figure>'
-    ) % (vcls, cls, style, html.escape(aria), html.escape(code), glyph,
-         html.escape(label), html.escape(note))
+        '<figure class="swatch swatch--%s%s"%s role="img" aria-label="%s">'
+        '<span class="swatch__weave" aria-hidden="true"></span>'
+        '<span class="swatch__edge" aria-hidden="true"></span>'
+        '%s'
+        '<span class="swatch__tag">%s</span>'
+        '</figure>'
+    ) % (tone, extra, style, aria, crest, tag)
+
+def photo(src, alt, ratio=None, cls="", tag=""):
+    """A real image rendered inside the swatch frame (selvedge edge + inset border + tone tag)."""
+    cls = (cls or "").replace("plate--fill", "swatch--fill")
+    fill = "swatch--fill" in cls
+    extra = (" " + cls.strip()) if cls.strip() else ""
+    style = "" if (fill or not ratio) else ' style="--ratio:%s"' % ratio
+    taghtml = ('<span class="swatch__tag">%s</span>' % tag) if tag else ""
+    return (
+        '<figure class="swatch swatch--photo%s"%s>'
+        '<img class="swatch__img" src="%s" alt="%s" loading="lazy" decoding="async">'
+        '<span class="swatch__edge" aria-hidden="true"></span>'
+        '%s'
+        '</figure>'
+    ) % (extra, style, html.escape(src), html.escape(alt), taghtml)
 
 def cta_row(wa_msg, on_ink=False, directions=True, call=True, compact=False):
     ghost = "btn--onink" if on_ink else "btn--ghost"
@@ -217,38 +275,61 @@ def trust_bar():
 # ============================================================
 # JSON-LD  (LocalBusiness / ClothingStore — Appendix A, extended)
 # ============================================================
-def json_ld(page_url):
-    # No aggregateRating: Google review content can't be cached into markup
-    # (Places policy), and self-serving review snippets are disallowed anyway.
-    agg = ""
-    return """<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "ClothingStore",
-  "@id": "%(origin)s/#business",
-  "name": "BespokeStudio",
-  "description": "Premium bespoke tailoring and Reid & Taylor fabric showroom in Basaveshwaranagar, Bengaluru.",
-  "url": "%(origin)s/",
-  "telephone": "+91-80-4989-1288",
-  "email": "support@bespokestudio.in",
-  "priceRange": "$$$",
-  "image": "%(origin)s/assets/img/og-cover.png",
-  "address": {"@type": "PostalAddress", "streetAddress": "568, Chord Rd, 3rd Stage, Basaveshwar Nagar", "addressLocality": "Bengaluru", "addressRegion": "Karnataka", "postalCode": "560079", "addressCountry": "IN"},
-  "geo": {"@type": "GeoCoordinates", "latitude": %(lat)s, "longitude": %(lng)s},
-  "openingHoursSpecification": [
-    {"@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"], "opens": "11:00", "closes": "21:00"},
-    {"@type": "OpeningHoursSpecification", "dayOfWeek": "Sunday", "opens": "11:00", "closes": "19:00"}
-  ],
-  "areaServed": ["Basaveshwaranagar","Rajajinagar","Vijayanagar","Malleshwaram","Bengaluru"],
-  "hasOfferCatalog": {"@type": "OfferCatalog", "name": "Bespoke tailoring and premium fabrics", "itemListElement": [
-    {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Men's bespoke suits"}},
-    {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Custom shirts and trousers"}},
-    {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Sherwani and ethnic wear tailoring"}},
-    {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Women's formal bespoke clothing"}},
-    {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Premium fabric consultation"}}
-  ]}%(agg)s
-}
-</script>""" % {"origin": SITE_ORIGIN, "lat": BIZ["lat"], "lng": BIZ["lng"], "agg": agg}
+def json_ld(page_url, breadcrumb=None, faq=None):
+    """schema.org @graph for the page.
+
+    Always: the ClothingStore business node (with `sameAs` -> Google profile).
+    `breadcrumb` (list of (name, url), Home first) -> a BreadcrumbList node, emitted
+    on interior pages. `faq` (list of (question, answer_html)) -> a FAQPage node, for
+    pages that render a .faq. No aggregateRating: Google review content can't be cached
+    into markup (Places policy) and self-serving review snippets are disallowed anyway.
+    """
+    business = {
+        "@type": "ClothingStore",
+        "@id": SITE_ORIGIN + "/#business",
+        "name": "BespokeStudio",
+        "description": "Bespoke tailoring atelier and premium fabric showroom in Basaveshwaranagar, Bengaluru, working with Reid & Taylor and other fine suiting cloths.",
+        "url": SITE_ORIGIN + "/",
+        "telephone": "+91-80-4989-1288",
+        "email": "support@bespokestudio.in",
+        "priceRange": "$$$",
+        "image": SITE_ORIGIN + "/assets/img/og-cover.png",
+        "sameAs": [GOOGLE["profile_url"]],
+        "address": {"@type": "PostalAddress", "streetAddress": "568, Chord Rd, 3rd Stage, Basaveshwar Nagar", "addressLocality": "Bengaluru", "addressRegion": "Karnataka", "postalCode": "560079", "addressCountry": "IN"},
+        "geo": {"@type": "GeoCoordinates", "latitude": BIZ["lat"], "longitude": BIZ["lng"]},
+        "openingHoursSpecification": [
+            {"@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"], "opens": "11:00", "closes": "21:00"},
+            {"@type": "OpeningHoursSpecification", "dayOfWeek": "Sunday", "opens": "11:00", "closes": "19:00"}
+        ],
+        "areaServed": ["Basaveshwaranagar","Rajajinagar","Vijayanagar","Malleshwaram","Bengaluru"],
+        "hasOfferCatalog": {"@type": "OfferCatalog", "name": "Bespoke tailoring and premium fabrics", "itemListElement": [
+            {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Men's bespoke suits"}},
+            {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Custom shirts and trousers"}},
+            {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Sherwani and ethnic wear tailoring"}},
+            {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Women's formal bespoke clothing"}},
+            {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Premium fabric consultation"}}
+        ]},
+    }
+    graph = [business]
+    if breadcrumb:
+        graph.append({
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                {"@type": "ListItem", "position": i + 1, "name": html.unescape(name), "item": url}
+                for i, (name, url) in enumerate(breadcrumb)
+            ],
+        })
+    if faq:
+        graph.append({
+            "@type": "FAQPage",
+            "mainEntity": [
+                {"@type": "Question", "name": html.unescape(q),
+                 "acceptedAnswer": {"@type": "Answer", "text": html.unescape(a)}}
+                for q, a in faq
+            ],
+        })
+    doc = {"@context": "https://schema.org", "@graph": graph}
+    return '<script type="application/ld+json">\n%s\n</script>' % json.dumps(doc, ensure_ascii=False, indent=2)
 
 # ============================================================
 # PAGE SHELL
@@ -265,7 +346,7 @@ GMAPS_LOADER = '''<script>
   window.BSPK_REVIEWS = { placeId: __PLACE_ID__, hasKey: true, profileUrl: __PROFILE_URL__ };
 </script>'''
 
-def head(title, desc, canonical, depth=0, reviews_page=False):
+def head(title, desc, canonical, depth=0, reviews_page=False, breadcrumb=None, faq=None):
     base = "../" * depth
     ga = ""
     if GA4_ID:
@@ -305,7 +386,7 @@ def head(title, desc, canonical, depth=0, reviews_page=False):
 %(ga)s
 %(maps)s""" % {
         "title": html.escape(title), "desc": html.escape(desc), "canonical": canonical,
-        "og_img": og_img, "base": base, "jsonld": json_ld(canonical), "ga": ga,
+        "og_img": og_img, "base": base, "jsonld": json_ld(canonical, breadcrumb, faq), "ga": ga,
         "maps": maps,
     }
 
@@ -420,10 +501,24 @@ def footer(depth=0):
         "dir": DIRECTIONS_URL, "profile": GOOGLE["profile_url"], "base": base,
     }
 
-def page(slug, title, desc, body, active, depth=0, service=None, reviews_page=False):
+def page(slug, title, desc, body, active, depth=0, service=None, reviews_page=False,
+         crumb=None, faq=None):
     canonical = clean_url(slug)
     page_id = slug.replace("/", "-").replace(".html", "") or "home"
     svc_attr = ' data-service="%s"' % html.escape(service) if service else ""
+    # BreadcrumbList (interior pages only). Home is level 1; the section label is the
+    # NAV label matched on `active` (or "Guides" for the guides cluster, not in NAV).
+    # `crumb` adds a leaf level (used by guide sub-pages: Home > Guides > <h1>).
+    breadcrumb = None
+    if slug not in ("", "index.html"):
+        section = next((l for h, l in NAV if h == active), None)
+        if section is None and active == "guides.html":
+            section = "Guides"
+        trail = [("Home", clean_url("index.html"))]
+        if clean_url(active) != canonical:          # a sub-page: add its section level
+            trail.append((section or "More", clean_url(active)))
+        trail.append((crumb or section or title, canonical))
+        breadcrumb = trail
     doc = """<!doctype html>
 <html lang="en">
 <head>
@@ -438,7 +533,7 @@ def page(slug, title, desc, body, active, depth=0, service=None, reviews_page=Fa
 %(dock)s
 </body>
 </html>""" % {
-        "head": head(title, desc, canonical, depth, reviews_page), "pid": page_id, "svc": svc_attr,
+        "head": head(title, desc, canonical, depth, reviews_page, breadcrumb, faq), "pid": page_id, "svc": svc_attr,
         "header": header(active, depth), "body": body, "footer": footer(depth), "dock": dock(),
     }
     return doc
@@ -476,7 +571,7 @@ def build_home():
   </div>
 </section>""" % {
         "cta": cta_row("Hello BespokeStudio, I would like to enquire about a custom suit / bespoke outfit."),
-        "plate": plate("PL · 01", "Storefront &amp; signage — Chord Road", "Reserved for exterior photography", variant="dark", ratio="4 / 5", cls="plate--fill"),
+        "plate": photo("assets/img/rt/reid-and-taylor-green-suit-campaign.jpg", "Reid & Taylor suiting — a finely cut three-piece", cls="swatch--fill", tag="R&amp;T · SUITING"),
     }
 
     # Services — dockets (signature element)
@@ -536,7 +631,7 @@ def build_home():
       </div>
     </div>
   </div>
-</section>""" % {"plate": plate("PL · 04", "Fabric wall — Reid &amp; Taylor suiting", "Reserved for showroom photography", variant="dark", ratio="4 / 3"),
+</section>""" % {"plate": photo("assets/img/rt/reid-and-taylor-suiting-fabric-navy-worsted.jpg", "Reid & Taylor navy worsted suiting cloth", ratio="4 / 3", tag="R&amp;T · NAVY WORSTED"),
                  "chips": chips, "arrow": icon("arrow")}
 
     # Process (dark, numbered — a genuine sequence)
@@ -566,8 +661,8 @@ def build_home():
     # Gallery preview
     gp = [
         plate("G · 01", "Storefront &amp; signage", "Exterior", "dark", "4 / 3", cls="g-span-2 plate--fill"),
-        plate("G · 02", "Fabric wall detail", "Showroom", "chalk", "1 / 1"),
-        plate("G · 03", "Finished suit on stand", "Garment", "dark", "1 / 1"),
+        photo("assets/img/rt/reid-and-taylor-suiting-fabric-charcoal.jpg", "Reid & Taylor charcoal worsted suiting", ratio="1 / 1", tag="CHARCOAL"),
+        photo("assets/img/rt/reid-and-taylor-suiting-fabric-worsted-grey.jpg", "Reid & Taylor worsted grey suiting", ratio="1 / 1", tag="GREY · WORSTED"),
         plate("G · 04", "Sherwani, close-up", "Ethnic", "dark", "1 / 1"),
         plate("G · 05", "Measuring in progress", "Craft", "chalk", "1 / 1"),
         plate("G · 06", "Shirt collar &amp; cuff", "Garment", "dark", "1 / 1"),
@@ -625,23 +720,23 @@ def build_services():
     body = [phero('Bespoke Tailoring', "Bespoke tailoring in Basaveshwaranagar", sub)]
 
     services = [
-        ("suits", "Men's Bespoke Suits", "custom suit tailor Basaveshwaranagar",
+        ("suits", "Men's Bespoke Suits", "Cut to measure in Basaveshwaranagar",
          "A structured suit is the sharpest thing in a wardrobe. We cut two- and three-piece suits to your measurements for the boardroom, the courtroom, weddings, and occasions — guided by fabric, posture, and the line you want through the shoulder and waist.",
          ["Business, wedding, reception, and formal occasions", "Reid &amp; Taylor and premium worsted suiting", "Collar, lapel, and trouser detail to your preference", "Trial fitting before finishing", "Usually 1&ndash;2 weeks; express on request"],
          "PL · 21", "Two-piece suit on stand — full length"),
-        ("shirts", "Custom Shirts &amp; Trousers", "custom shirts Basaveshwaranagar; trouser tailoring near me",
+        ("shirts", "Custom Shirts &amp; Trousers", "Everyday tailoring, done properly",
          "The workhorses of a wardrobe, made to fit properly. Shirts built to your block with collar and cuff options, and trousers cut to sit clean through the seat and leg — ideal for building an office rotation that actually fits.",
          ["Collar, cuff, and placket options", "Cotton, linen, and blended shirtings", "Trousers cut for seat, rise, and break", "Office wardrobe combinations", "Usually 1&ndash;2 weeks"],
          "PL · 22", "Shirt collar &amp; cuff — close-up"),
-        ("ethnic", "Sherwani &amp; Ethnic Wear", "custom sherwani Basaveshwaranagar; wedding tailor Bangalore",
+        ("ethnic", "Sherwani &amp; Ethnic Wear", "Dressed for the occasion",
          "Occasion clothing that looks rich without looking loud. Sherwani, bandh gala, and coordinated wedding and reception looks — with unhurried family fittings so the whole party is dressed to one standard.",
          ["Wedding, reception, and festive outfits", "Sherwani, bandh gala, and formal Indian wear", "Family consultations and group fittings", "Fabric and finish guidance for the occasion", "Express delivery available on request"],
          "PL · 23", "Sherwani — detail &amp; drape"),
-        ("women", "Women's Formal Clothing", "women's formal tailor Basaveshwaranagar",
+        ("women", "Women's Formal Clothing", "Tailored for work and events",
          "Formal clothing that fits well and feels premium. Tailored blazers, trousers, and formal sets cut for a clean line and a considered hand — for work, events, and occasions.",
          ["Blazers, trousers, and formal sets where applicable", "Premium suiting and formal fabrics", "Fit consultation for a confident line", "Made to your measurements", "Usually 1&ndash;2 weeks"],
          "PL · 24", "Women's blazer — tailored line"),
-        ("alterations", "Alterations &amp; Refitting", "alterations Basaveshwaranagar; suit alteration near me",
+        ("alterations", "Alterations &amp; Refitting", "Bring a good piece back to line",
          "Sometimes the right move is to refit what you own. We re-cut and refit existing garments — taking in, letting out, reshaping — to bring a good piece back to a sharp line.",
          ["Refit, take-in, and reshaping", "Restoring the line on existing garments", "Assessment before any work", "Priority turnaround on request"],
          "PL · 25", "Chalk marks on a jacket — refit"),
@@ -713,7 +808,23 @@ def build_fabrics():
   </div>
 </section>""" % {"wa": wa("Hello BespokeStudio, I would like to ask about Reid & Taylor fabric availability."),
                  "wa_ic": icon("wa"),
-                 "plate": plate("PL · 31", "Reid &amp; Taylor lengths on the wall", "Reserved for showroom photography", "dark", "4 / 3")})
+                 "plate": photo("assets/img/rt/reid-and-taylor-heritage-tailoring.jpg", "Reid & Taylor heritage tailoring", ratio="4 / 3", tag="REID &amp; TAYLOR · HERITAGE")})
+
+    _fw = [
+        ("reid-and-taylor-suiting-fabric-navy-worsted.jpg", "Reid & Taylor navy worsted suiting", "NAVY \u00b7 WORSTED"),
+        ("reid-and-taylor-suiting-fabric-charcoal.jpg", "Reid & Taylor charcoal worsted suiting", "CHARCOAL"),
+        ("reid-and-taylor-suiting-fabric-worsted-grey.jpg", "Reid & Taylor worsted grey suiting", "GREY"),
+        ("reid-and-taylor-suiting-fabric-irish-coffee-brown.jpg", "Reid & Taylor irish-coffee brown twill", "IRISH COFFEE"),
+        ("reid-and-taylor-suiting-fabric-navy-bolt.jpg", "A bolt of Reid & Taylor navy suiting", "ON THE BOLT"),
+    ]
+    body.append('''
+<section class="section section--deep">
+  <div class="wrap">
+    <div class="sec-head reveal"><span class="eyebrow">The cloth, in hand</span><h2 class="section-title">A sample of the Reid &amp; Taylor wall.</h2>
+    <p>Genuine Reid &amp; Taylor Super 100s suiting &mdash; a few of the tones we cut most often. Handle the full range in the showroom.</p></div>
+    <div class="gallery mt-3">%s</div>
+  </div>
+</section>''' % "".join(photo("assets/img/rt/" + s, a, ratio="3 / 4", tag=tg) for s, a, tg in _fw))
 
     fabrics = [
         ("Worsted wool", "The backbone of a good suit. Smooth, resilient, and quick to shed creases — ideal for structured suits and formal trousers that keep their shape."),
@@ -755,7 +866,7 @@ def build_fabrics():
       </div>
     </div>
   </div>
-</section>""" % {"plate": plate("PL · 32", "Swatches &amp; grain — macro", "Reserved for fabric photography", "chalk", "4 / 3"), "arrow": icon("arrow")})
+</section>""" % {"plate": photo("assets/img/rt/reid-and-taylor-suiting-fabric-irish-coffee-brown.jpg", "Reid & Taylor irish-coffee brown twill", ratio="4 / 3", tag="IRISH COFFEE · TWILL"), "arrow": icon("arrow")})
 
     body.append(cta_band())
     return page("fabrics.html",
@@ -821,21 +932,22 @@ def build_craft():
 # GALLERY
 # ============================================================
 def build_gallery():
-    sub = "The showroom, the fabric wall, and finished work. These plates mark exactly what will be photographed for launch — real garments and real workmanship, never stock."
+    sub = "The showroom, the fabric wall, and finished work — organised by cloth and by craft. Every piece is made in-house; nothing here is stock."
     body = [phero('Gallery', "The showroom &amp; the work", sub)]
 
     groups = [
         ("Storefront &amp; showroom", [
             ("G · 01", "Storefront &amp; signage — Chord Road", "Exterior", "dark", "3 / 2", "g-span-2 plate--fill"),
             ("G · 02", "Entrance &amp; window", "Exterior", "chalk", "1 / 1", ""),
-            ("G · 03", "Fabric wall — wide", "Showroom", "dark", "1 / 1", ""),
+            ("G · 03", "Reid &amp; Taylor on the wall", "Fabric", "dark", "1 / 1", "", "reid-and-taylor-suiting-fabric-irish-coffee-brown.jpg"),
             ("G · 04", "Consultation table", "Showroom", "chalk", "1 / 1", ""),
         ]),
-        ("Fabrics", [
-            ("G · 05", "Reid &amp; Taylor lengths", "Fabric", "dark", "1 / 1", ""),
-            ("G · 06", "Wool &amp; worsted — macro", "Fabric", "chalk", "1 / 1", ""),
-            ("G · 07", "Linen &amp; cotton shirtings", "Fabric", "dark", "1 / 1", ""),
-            ("G · 08", "Silk &amp; blends detail", "Fabric", "chalk", "1 / 1", ""),
+        ("Reid &amp; Taylor cloth", [
+            ("G · 05", "Reid &amp; Taylor navy worsted", "Navy \u00b7 worsted", "dark", "1 / 1", "", "reid-and-taylor-suiting-fabric-navy-worsted.jpg"),
+            ("G · 06", "Reid &amp; Taylor charcoal worsted", "Charcoal", "chalk", "1 / 1", "", "reid-and-taylor-suiting-fabric-charcoal.jpg"),
+            ("G · 07", "Reid &amp; Taylor worsted grey", "Grey", "dark", "1 / 1", "", "reid-and-taylor-suiting-fabric-worsted-grey.jpg"),
+            ("G · 08", "Reid &amp; Taylor on the bolt", "Super 100s", "chalk", "1 / 1", "", "reid-and-taylor-suiting-fabric-navy-bolt.jpg"),
+            ("G · 09", "Reid &amp; Taylor heritage", "Heritage", "dark", "1 / 1", "", "reid-and-taylor-heritage-tailoring.jpg"),
         ]),
         ("Finished garments", [
             ("G · 09", "Two-piece suit on stand", "Garment", "dark", "3 / 4", ""),
@@ -852,7 +964,11 @@ def build_gallery():
     ]
     for i, (title, plates) in enumerate(groups):
         variant = "paper" if i % 2 == 0 else "deep"
-        pl = "".join(plate(c, cap, tag, v, r, cls=cls) for c, cap, tag, v, r, cls in plates)
+        def _tile(x):
+            if len(x) > 6 and x[6]:
+                return photo("assets/img/rt/" + x[6], html.unescape(x[1]), ratio=x[4], cls=x[5], tag=x[2])
+            return plate(x[0], x[1], x[2], x[3], x[4], cls=x[5])
+        pl = "".join(_tile(x) for x in plates)
         body.append("""
 <section class="section section--%(variant)s">
   <div class="wrap">
@@ -976,7 +1092,7 @@ def build_contact():
     return page("contact.html",
                 "Visit & Contact — Basaveshwaranagar Showroom | BespokeStudio",
                 "Visit BespokeStudio at 568, Chord Rd, 3rd Stage, Basaveshwar Nagar, Bengaluru, Karnataka 560079. WhatsApp +91 99002 59407, call 080 4989 1288. Open Mon–Sat 11–9, Sun 11–7.",
-                "".join(body), "contact.html", depth=0, service="contact")
+                "".join(body), "contact.html", depth=0, service="contact", faq=faqs)
 
 # ============================================================
 # GUIDES (SEO content cluster)
@@ -985,9 +1101,9 @@ def build_guides_index():
     sub = "Practical, local answers on custom suits, premium fabrics, and wedding tailoring in Basaveshwaranagar and West Bengaluru — written to help you decide before you visit."
     body = [phero('Guides', "Guides &amp; journal", sub)]
     guides = [
-        ("guides/best-bespoke-tailor-basaveshwaranagar.html", "LG · 01", "Choosing a bespoke tailor in Basaveshwaranagar", "What to check on fabric, fit, and delivery before you commit to a tailor."),
-        ("guides/custom-suits-fabric-fit-delivery.html", "LG · 02", "Custom suits: fabric, fit &amp; delivery, explained", "A plain guide to commissioning a suit that actually fits — and how long it takes."),
-        ("guides/reid-and-taylor-fabrics-bengaluru.html", "LG · 03", "Reid &amp; Taylor fabrics: choosing your suiting", "How to pick the right suiting cloth for the occasion and the Bengaluru climate."),
+        ("guides/best-bespoke-tailor-basaveshwaranagar.html", "Choosing a tailor", "Choosing a bespoke tailor in Basaveshwaranagar", "What to check on fabric, fit, and delivery before you commit to a tailor."),
+        ("guides/custom-suits-fabric-fit-delivery.html", "The suit, explained", "Custom suits: fabric, fit &amp; delivery, explained", "A plain guide to commissioning a suit that actually fits — and how long it takes."),
+        ("guides/reid-and-taylor-fabrics-bengaluru.html", "At the fabric wall", "Reid &amp; Taylor fabrics: choosing your suiting", "How to pick the right suiting cloth for the occasion and the Bengaluru climate."),
     ]
     cards = "".join(
         '<a class="guide reveal" href="%s"><span class="guide__ref">%s</span><h3>%s</h3><p>%s</p><span class="tlink">Read the guide %s</span></a>' % (h, r, t, d, icon("arrow"))
@@ -1030,7 +1146,7 @@ def guide_page(slug, title, meta, crumb, h1, intro, sections, related):
   </div>
 </section>""" % {"secs": secs, "cta": cta_row("Hello BespokeStudio, I read your guide and would like a consultation.", on_ink=False), "rel": rel})
     body.append(cta_band())
-    return page(slug, title, meta, "".join(body), "guides.html", depth=depth, service="guide")
+    return page(slug, title, meta, "".join(body), "guides.html", depth=depth, service="guide", crumb=h1)
 
 def build_guide_1():
     return guide_page(

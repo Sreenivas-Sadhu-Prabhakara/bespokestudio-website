@@ -5,15 +5,29 @@
    One restraint risk: a single hairline of oxblood "selvedge thread"
    ============================================================ */
 
+/* self-hosted faces — no runtime CDN. Fraunces (display, high-contrast old-style,
+   variable opsz+wght) + Hanken Grotesk (body). Both SIL OFL. */
+@font-face {
+  font-family: "Fraunces";
+  src: url("../fonts/fraunces-var.woff2") format("woff2");
+  font-weight: 340 560; font-stretch: 100%; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "Hanken Grotesk";
+  src: url("../fonts/hanken-var.woff2") format("woff2");
+  font-weight: 400 600; font-style: normal; font-display: swap;
+}
+
 :root {
   /* --- cloth palette --- */
-  --ink:        #17150F;   /* warm near-black — primary text, dark cloth */
-  --charcoal:   #2A2620;   /* charcoal wool — dark panels */
+  --ink:        #16130D;   /* warm near-black — primary text, dark cloth */
+  --charcoal:   #26221B;   /* charcoal wool — dark panels */
+  --midnight:   #1C2230;   /* midnight worsted — a second dark cloth tone */
   --oat:        #EFE9DB;   /* oat paper — main ground (deeper than the AI-cream default) */
-  --oat-deep:   #E5DDCB;   /* recessed oat */
+  --oat-deep:   #E6DECC;   /* recessed oat */
   --chalk:      #FBF8F1;   /* tailor's chalk — raised cards */
-  --brass:      #9C7A44;   /* muted brass — the accent, used with restraint */
-  --brass-lo:   #B79A6A;   /* lighter brass for dark grounds */
+  --brass:      #A07E44;   /* muted brass — the accent on light grounds */
+  --brass-lo:   #C6A868;   /* champagne brass for dark grounds */
   --selvedge:   #7A2E22;   /* oxblood selvedge thread — the one risk, 1px only */
 
   --ink-70:     rgba(23,21,15,0.70);
@@ -559,3 +573,260 @@ section { position: relative; }
   .reveal { opacity: 1; transform: none; transition: none; }
   .btn:hover, .docket:hover { transform: none; }
 }
+
+/* ════════════════════════════════════════════════════════════
+   ATELIER EDITORIAL — couture-serif redesign layer + .swatch component
+   Appended AFTER the existing rules in site.css. Additive and ordered;
+   it never overrides bare `.section` padding, so section rhythm is intact.
+   Uses ONLY the declared design tokens. Does not touch .gr-* / #gr-*.
+   The legacy .plate rules (site.css ~326-362) become dead-but-harmless:
+   build.py no longer emits any .plate markup after the plate()->swatch swap.
+   ════════════════════════════════════════════════════════════ */
+
+/* ── 0 · TOKEN FIX (required) ─────────────────────────────────
+   The live :root (line 44) points --sans at a system stack and defines NO
+   --serif, so the self-hosted Fraunces face never renders. Re-declare the
+   font tokens here — the later :root declaration wins at equal specificity. */
+:root {
+  --serif: "Fraunces", Georgia, "Times New Roman", serif;
+  --sans:  "Hanken Grotesk", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --mono:  ui-monospace, "SF Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+}
+
+/* ── 1 · TYPE SCALE — serif display, sans body, mono data ───── */
+.display, .hero h1, .phero h1 {
+  font-family: var(--serif); font-weight: 380; line-height: 1.02;
+  letter-spacing: -0.018em; font-variation-settings: "opsz" 140, "wght" 380;
+}
+.hero h1 { font-weight: 420; font-variation-settings: "opsz" 144, "wght" 420; }
+h1, h2, h3, h2.section-title, .split__body h2, .prose h2 {
+  font-family: var(--serif); font-weight: 400; letter-spacing: -0.014em;
+  font-variation-settings: "opsz" 72, "wght" 400;
+}
+h2.section-title { font-weight: 400; line-height: 1.06; font-variation-settings: "opsz" 88, "wght" 410; }
+h3, .docket h3, .step h3, .guide h3, .review__q {
+  font-variation-settings: "opsz" 32, "wght" 460; font-weight: 460; letter-spacing: -0.006em;
+}
+.faq summary { font-family: var(--serif); font-weight: 440; font-variation-settings: "opsz" 30, "wght" 440; }
+body, p, .lede { font-family: var(--sans); }
+.lede { max-width: 42rem; font-weight: 400; }
+.eyebrow, .data, .brand__place, .hero__doc, .docket__ref, .docket__idx, .step__n,
+.review__meta, .review__tag, .trust__n, .trust__k, .nap__k, .gr-rating, .gr-count,
+.gr-badge, .phero__crumb, .site-footer h4, .footer__data, .footer__bar, .brand__mark,
+.guide__ref, .swatch__tag { font-family: var(--mono); }
+
+/* ── 2 · SWATCH — a CSS-woven cloth field (replaces .plate) ────
+   Layered twill/herringbone + pressed sheen; debossed monogram crest;
+   woven selvedge edge; mono tone-tag. No photo, no placeholder text. */
+.swatch {
+  --cloth:  var(--charcoal);
+  --thread: var(--chalk-09);
+  --sheen:  var(--chalk-16);
+  --mark:   var(--chalk);
+  --tag:    var(--chalk-46);
+  --frame:  var(--chalk-16);
+  position: relative; overflow: hidden; isolation: isolate;
+  aspect-ratio: var(--ratio, 4 / 3);
+  background-color: var(--cloth);
+  color: var(--mark);
+  border: 1px solid var(--ink-14);
+  display: flex;
+}
+.swatch--fill { aspect-ratio: auto; width: 100%; }
+
+/* cloth TONE variants — build.py cycles these */
+.swatch--worsted  { --cloth: var(--charcoal); }
+.swatch--midnight { --cloth: var(--midnight); }
+.swatch--oxblood  { --cloth: var(--selvedge); }
+.swatch--ink      { --cloth: var(--ink); }
+.swatch--camel {                                   /* the one light cloth */
+  --cloth: var(--oat-deep);
+  --thread: var(--ink-08); --sheen: var(--ink-14);
+  --mark: var(--ink); --tag: var(--ink-38); --frame: var(--ink-14);
+}
+
+/* woven ground: opposed twill threads */
+.swatch__weave {
+  position: absolute; inset: 0; z-index: 0;
+  background-image:
+    repeating-linear-gradient( 63deg, var(--thread) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(-63deg, var(--sheen)  0 1px, transparent 1px 3px);
+}
+/* chevron layer: narrow bands reverse the lean -> herringbone zig-zag */
+.swatch__weave::before {
+  content: ""; position: absolute; inset: 0;
+  background-image:
+    repeating-linear-gradient(-63deg, var(--thread) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient( 63deg, var(--sheen)  0 1px, transparent 1px 3px);
+  -webkit-mask-image: repeating-linear-gradient(90deg, #000 0 9px, transparent 9px 18px);
+          mask-image: repeating-linear-gradient(90deg, #000 0 9px, transparent 9px 18px);
+}
+/* pressed-cloth sheen */
+.swatch__weave::after {
+  content: ""; position: absolute; inset: 0;
+  background:
+    radial-gradient(130% 90% at 26% 16%, var(--sheen) 0%, transparent 42%),
+    linear-gradient(158deg, transparent 52%, rgba(0,0,0,.16) 100%);
+  mix-blend-mode: soft-light;
+}
+.swatch--camel .swatch__weave::after { mix-blend-mode: multiply; opacity: .55; }
+
+/* hairline inset frame, like a bolt-ticket border */
+.swatch__edge {
+  position: absolute; inset: .62rem; z-index: 1; pointer-events: none;
+  border: 1px solid var(--frame);
+}
+/* woven selvedge stripe down the true left edge (the one oxblood risk) */
+.swatch::after {
+  content: ""; position: absolute; z-index: 1; top: 0; bottom: 0; left: 0; width: 3px;
+  background:
+    linear-gradient(var(--selvedge), var(--selvedge)),
+    repeating-linear-gradient(0deg, transparent 0 5px, rgba(0,0,0,.35) 5px 6px);
+  background-blend-mode: multiply; opacity: .92;
+}
+
+/* debossed monogram crest, centred watermark */
+.swatch__crest {
+  position: absolute; z-index: 1; inset: 0; margin: auto;
+  width: 34%; max-width: 7rem; height: auto;
+  color: var(--mark); opacity: .14;
+  filter: drop-shadow(0 1px 0 rgba(0,0,0,.4)) drop-shadow(0 -1px 0 rgba(255,255,255,.07));
+}
+.swatch--camel .swatch__crest {
+  opacity: .22;
+  filter: drop-shadow(0 1px 0 rgba(255,255,255,.6)) drop-shadow(0 -1px 0 rgba(0,0,0,.2));
+}
+
+/* mono tone-tag (fabric code), top-left, clear of the selvedge */
+.swatch__tag {
+  position: absolute; top: .85rem; left: 1.1rem; z-index: 2;
+  font-size: .58rem; letter-spacing: .22em; text-transform: uppercase; color: var(--tag);
+}
+
+/* hero + gallery fill: swatch fills its cell exactly as .plate--fill did.
+   Replaces the old `.hero__plate .plate` rule at site.css line 320. */
+.hero__plate .swatch { width: 100%; height: 100%; aspect-ratio: auto; }
+
+/* ── 3 · CINEMATIC HOME HERO (dark cloth) ─────────────────────
+   Scoped to body[data-page="index"] .hero — only the home hero goes dark,
+   so no build.py change is needed. IMPORTANT: this DOES set an explicit
+   padding-top/bottom, overriding the base .hero rule (line 311) for the
+   home page only — deliberate so the dark ground has breathing room above
+   and below before it meets the trust bar. Other pages keep base padding. */
+body[data-page="index"] .hero, .hero--dark {
+  background:
+    radial-gradient(120% 80% at 72% 8%, rgba(198,168,104,0.10), transparent 55%),
+    radial-gradient(140% 120% at 50% 120%, rgba(122,46,34,0.14), transparent 60%),
+    linear-gradient(190deg, var(--midnight) 0%, var(--charcoal) 46%, var(--ink) 100%);
+  color: var(--chalk);
+  padding-top: clamp(3.5rem, 7vw, 6rem); padding-bottom: clamp(3.5rem, 7vw, 6rem);
+  position: relative; isolation: isolate; overflow: hidden;
+}
+body[data-page="index"] .hero::before, .hero--dark::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background-image:
+    repeating-linear-gradient(45deg,  var(--chalk-09) 0 1px, transparent 1px 7px),
+    repeating-linear-gradient(-45deg, var(--chalk-09) 0 1px, transparent 1px 7px);
+  opacity: 0.6; mix-blend-mode: overlay;
+}
+body[data-page="index"] .hero::after, .hero--dark::after {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(130% 100% at 50% -10%, transparent 55%, rgba(0,0,0,0.28) 100%),
+    linear-gradient(0deg, rgba(0,0,0,0.30), transparent 30%);
+}
+body[data-page="index"] .hero h1   { color: var(--chalk); position: relative; padding-bottom: 1.4rem; }
+body[data-page="index"] .hero__sub { color: var(--chalk-70); max-width: 34rem; }
+body[data-page="index"] .hero__doc { color: var(--chalk-46); }
+body[data-page="index"] .hero h1::after {
+  content: ""; position: absolute; left: 0; bottom: 0; height: 1px; width: min(20rem, 62%);
+  background: linear-gradient(90deg, var(--brass-lo), rgba(198,168,104,0));
+  transform-origin: left; transform: scaleX(1);
+}
+body[data-page="index"] .hero h1::before {
+  content: ""; position: absolute; left: 0; bottom: 4px; height: 1px; width: 2.4rem;
+  background: var(--selvedge); opacity: 0.9;
+}
+body[data-page="index"] .hero .btn--wa { background: var(--chalk); color: var(--ink); }
+body[data-page="index"] .hero .btn--wa:hover { background: var(--oat); color: var(--ink); }
+body[data-page="index"] .hero .btn--ghost { border-color: var(--chalk-46); color: var(--chalk); }
+body[data-page="index"] .hero .btn--ghost:hover { background: var(--chalk); color: var(--ink); border-color: var(--chalk); }
+/* on the dark hero, the swatch fill reads as a framed monogram field */
+body[data-page="index"] .hero__plate { border: 1px solid var(--chalk-16); }
+
+/* ── 4 · MOTION ───────────────────────────────────────────────
+   Keyed off html.js (set synchronously in <head>, build.py line 287) so
+   no-JS visitors see the finished state. Prefixed keyframe names avoid any
+   collision with existing animations. */
+@keyframes bs-rise     { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+@keyframes bs-drawline { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.js body[data-page="index"] .hero__doc,
+.js body[data-page="index"] .hero h1,
+.js body[data-page="index"] .hero__sub,
+.js body[data-page="index"] .hero .cta-row { opacity: 0; animation: bs-rise 0.8s var(--ease) forwards; }
+.js body[data-page="index"] .hero__doc     { animation-delay: 0.05s; }
+.js body[data-page="index"] .hero h1       { animation-delay: 0.18s; }
+.js body[data-page="index"] .hero__sub     { animation-delay: 0.34s; }
+.js body[data-page="index"] .hero .cta-row { animation-delay: 0.48s; }
+.js body[data-page="index"] .hero h1::after { transform: scaleX(0); animation: bs-drawline 0.9s var(--ease) 0.62s forwards; }
+.js body[data-page="index"] .hero__plate    { opacity: 0; animation: bs-rise 1s var(--ease) 0.4s forwards; }
+/* neutralise the generic .reveal on hero children (they carry .reveal in markup)
+   so it doesn't fight the load animation */
+.js body[data-page="index"] .hero .hero__body.reveal { opacity: 0; transform: none; }
+.js body[data-page="index"] .hero .hero__body.reveal.is-in { opacity: 1; }
+.js body[data-page="index"] .hero .hero__plate.reveal { transform: none; }
+
+/* hover micro-interactions. This adds a base `.nav a::after` — reconciled with the
+   existing `.nav a[aria-current="page"]::after` (site.css line 221): since both target
+   the single ::after pseudo, the aria-current rule below restores scaleX(1) so the
+   current-page underline still shows. */
+.nav a::after {
+  content: ""; position: absolute; left: 0; bottom: -0.15rem; height: 1px; right: 0;
+  background: var(--brass); transform: scaleX(0); transform-origin: left; transition: transform .3s var(--ease);
+}
+.nav a:hover::after, .nav a[aria-current="page"]::after { transform: scaleX(1); }
+.swatch { transition: transform .35s var(--ease), box-shadow .35s var(--ease); }
+.gallery .swatch:hover, .split__media .swatch:hover { transform: translateY(-2px); box-shadow: 0 18px 40px -28px rgba(23,21,15,0.55); }
+
+/* ── 5 · MATERIAL POLISH ────────────────────────────────────── */
+.btn--brass { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--brass-lo) 60%, transparent); }
+.btn--ghost:hover { box-shadow: inset 0 0 0 1px var(--brass); }
+.prose a, .nap__v a, .faq details p a {
+  background-image: linear-gradient(var(--brass), var(--brass));
+  background-repeat: no-repeat; background-position: 0 100%; background-size: 0% 1px;
+  border-bottom: 0; padding-bottom: 1px; transition: background-size .35s var(--ease), color .2s var(--ease);
+}
+.prose a:hover, .nap__v a:hover, .faq details p a:hover { background-size: 100% 1px; color: var(--ink); }
+/* subtle paper grain on light sections. section{position:relative} already exists
+   (line 289); all section content is inside .wrap, which we lift above the texture. */
+.section--paper, .section--deep { position: relative; }
+.section--paper::after, .section--deep::after {
+  content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    repeating-linear-gradient(0deg,  var(--ink-08) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, var(--ink-08) 0 1px, transparent 1px 3px);
+  opacity: 0.35; mix-blend-mode: multiply;
+}
+.section--paper > .wrap, .section--deep > .wrap { position: relative; z-index: 1; }
+
+/* ── 6 · REDUCED MOTION — collapse to end state ─────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .js body[data-page="index"] .hero__doc,
+  .js body[data-page="index"] .hero h1,
+  .js body[data-page="index"] .hero__sub,
+  .js body[data-page="index"] .hero .cta-row,
+  .js body[data-page="index"] .hero__plate { animation: none; opacity: 1; transform: none; }
+  .js body[data-page="index"] .hero h1::after { animation: none; transform: scaleX(1); }
+  .nav a::after, .swatch, .btn { transition: none; }
+  .prose a, .nap__v a, .faq details p a { transition: color .01s; }
+  .gallery .swatch:hover, .split__media .swatch:hover { transform: none; box-shadow: none; }
+}
+
+
+/* real R&T photography rendered inside the swatch frame (selvedge + inset border + tag) */
+.swatch--photo { --cloth: var(--ink); }
+.swatch--photo .swatch__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; display: block; }
+.swatch--photo .swatch__weave, .swatch--photo .swatch__crest { display: none; }
+.swatch--photo .swatch__edge { border-color: rgba(251,248,241,0.22); z-index: 2; }
+.swatch--photo .swatch__tag { z-index: 2; color: var(--chalk); background: rgba(0,0,0,0.46); padding: .26rem .5rem; }
+.swatch--photo::after { opacity: .85; }
