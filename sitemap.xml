@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://bespokestudio.co.in/index.html</loc><changefreq>monthly</changefreq><priority>1.0</priority></url>
-  <url><loc>https://bespokestudio.co.in/bespoke-tailoring.html</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://bespokestudio.co.in/fabrics.html</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://bespokestudio.co.in/craftsmanship.html</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://bespokestudio.co.in/gallery.html</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://bespokestudio.co.in/reviews.html</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://bespokestudio.co.in/about.html</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://bespokestudio.co.in/contact.html</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://bespokestudio.co.in/guides.html</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://bespokestudio.co.in/guides/best-bespoke-tailor-basaveshwaranagar.html</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://bespokestudio.co.in/guides/custom-suits-fabric-fit-delivery.html</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://bespokestudio.co.in/guides/reid-and-taylor-fabrics-bengaluru.html</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://bespokestudio.co.in/</loc><changefreq>monthly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://bespokestudio.co.in/bespoke-tailoring</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://bespokestudio.co.in/fabrics</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://bespokestudio.co.in/craftsmanship</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://bespokestudio.co.in/gallery</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://bespokestudio.co.in/reviews</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://bespokestudio.co.in/about</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://bespokestudio.co.in/contact</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://bespokestudio.co.in/guides</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://bespokestudio.co.in/guides/best-bespoke-tailor-basaveshwaranagar</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://bespokestudio.co.in/guides/custom-suits-fabric-fit-delivery</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://bespokestudio.co.in/guides/reid-and-taylor-fabrics-bengaluru</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
 </urlset>

@@ -421,7 +421,7 @@ def footer(depth=0):
     }
 
 def page(slug, title, desc, body, active, depth=0, service=None, reviews_page=False):
-    canonical = SITE_ORIGIN + "/" + slug
+    canonical = clean_url(slug)
     page_id = slug.replace("/", "-").replace(".html", "") or "home"
     svc_attr = ' data-service="%s"' % html.escape(service) if service else ""
     doc = """<!doctype html>
@@ -1119,10 +1119,22 @@ FAVICON = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
 <rect x="20" y="47" width="24" height="2" fill="#7A2E22"/>
 </svg>"""
 
+def clean_url(slug):
+    """Cloudflare Pages serves extensionless URLs (/reviews, not /reviews.html)
+    and 308-redirects the .html form. Emit canonical / OG / sitemap URLs to match
+    what is actually served, so canonical never points at a redirect."""
+    if slug in ("", "index.html"):
+        return SITE_ORIGIN + "/"
+    if slug.endswith("/index.html"):
+        return SITE_ORIGIN + "/" + slug[:-len("index.html")]
+    if slug.endswith(".html"):
+        return SITE_ORIGIN + "/" + slug[:-len(".html")]
+    return SITE_ORIGIN + "/" + slug
+
 def build_sitemap(slugs):
     urls = ""
     for slug in slugs:
-        loc = SITE_ORIGIN + "/" + slug
+        loc = clean_url(slug)
         pri = "1.0" if slug == "index.html" else ("0.9" if "/" not in slug else "0.6")
         urls += "  <url><loc>%s</loc><changefreq>monthly</changefreq><priority>%s</priority></url>\n" % (loc, pri)
     return '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n%s</urlset>\n' % urls
