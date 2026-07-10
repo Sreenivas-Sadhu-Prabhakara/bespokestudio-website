@@ -65,6 +65,7 @@
       var when = r.relativePublishTimeDescription || "";
       var text = (r.text || "").trim();
       if (!text) continue; // some reviews are rating-only; skip empties
+      var rr = (typeof r.rating === "number") ? r.rating : null; // rating is optional
 
       // Mandatory per-review author attribution: avatar + name + profile link.
       var avatar = photo
@@ -77,7 +78,7 @@
             '<a class="gr-author" href="' + esc(uri) + '" target="_blank" rel="noopener noreferrer">' +
               avatar + '<span class="gr-name">' + esc(name) + '</span>' +
             '</a>' +
-            '<span class="review__stars" aria-label="' + esc(r.rating) + ' out of 5">' + stars(r.rating) + '</span>' +
+            (rr != null ? '<span class="review__stars" aria-label="Rated ' + esc(rr) + ' out of 5">' + stars(rr) + '</span>' : '') +
           '</div>' +
           '<blockquote class="review__q">' + esc(text) + '</blockquote>' +
           '<figcaption class="review__meta">' +

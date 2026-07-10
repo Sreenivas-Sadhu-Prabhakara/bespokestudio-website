@@ -281,7 +281,7 @@ def head(title, desc, canonical, depth=0, reviews_page=False):
                   .replace("__GMAPS_KEY__", json.dumps(GMAPS_KEY))
                   .replace("__PLACE_ID__", json.dumps(PLACE_ID))
                   .replace("__PROFILE_URL__", json.dumps(GOOGLE["profile_url"])))
-        maps = loader + '\n<script src="%sassets/js/reviews.js?v=1" defer></script>' % base
+        maps = loader + '\n<script src="%sassets/js/reviews.js?v=2" defer></script>' % base
     return """<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script>document.documentElement.classList.add('js')</script>
@@ -1147,7 +1147,7 @@ HEADERS = """/assets/*
 # them with the mandatory Google attribution. ANY failure / missing key -> it reveals
 # the static #gr-fallback block. Review content is NEVER cached into HTML.
 # NOTE: served from /assets/* (immutable 1-yr cache); the loader references it as
-# `reviews.js?v=1` — bump that ?v= in GMAPS_LOADER + here if you edit this module.
+# `reviews.js?v=N` — bump that ?v= in head() when you edit this module (now v2).
 REVIEWS_JS = r"""/* BespokeStudio - live Google reviews (Maps JS Place class).
    Self-contained, no third-party widget. Renders ONLY live data.
    On any failure / missing key -> reveals the static "Read on Google" block. */
@@ -1215,6 +1215,7 @@ REVIEWS_JS = r"""/* BespokeStudio - live Google reviews (Maps JS Place class).
       var when = r.relativePublishTimeDescription || "";
       var text = (r.text || "").trim();
       if (!text) continue; // some reviews are rating-only; skip empties
+      var rr = (typeof r.rating === "number") ? r.rating : null; // rating is optional
 
       // Mandatory per-review author attribution: avatar + name + profile link.
       var avatar = photo
@@ -1227,7 +1228,7 @@ REVIEWS_JS = r"""/* BespokeStudio - live Google reviews (Maps JS Place class).
             '<a class="gr-author" href="' + esc(uri) + '" target="_blank" rel="noopener noreferrer">' +
               avatar + '<span class="gr-name">' + esc(name) + '</span>' +
             '</a>' +
-            '<span class="review__stars" aria-label="' + esc(r.rating) + ' out of 5">' + stars(r.rating) + '</span>' +
+            (rr != null ? '<span class="review__stars" aria-label="Rated ' + esc(rr) + ' out of 5">' + stars(rr) + '</span>' : '') +
           '</div>' +
           '<blockquote class="review__q">' + esc(text) + '</blockquote>' +
           '<figcaption class="review__meta">' +
