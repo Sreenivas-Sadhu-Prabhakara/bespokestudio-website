@@ -42,9 +42,15 @@ BIZ = {
 }
 
 ADDR_ONELINE = "568, Chord Rd, 3rd Stage, Basaveshwar Nagar, Bengaluru, Karnataka 560079"
-MAPS_QUERY = quote("BespokeStudio, " + ADDR_ONELINE)
-DIRECTIONS_URL = "https://www.google.com/maps/dir/?api=1&destination=" + MAPS_QUERY
-MAP_EMBED_URL = "https://www.google.com/maps?q=" + MAPS_QUERY + "&output=embed"
+# Exact Google Maps pin for the shop, verified from the owner's own Maps link
+# (maps.app.goo.gl/nMGf3KXcBSkBAbiaA -> the "Reid & Taylor" listing, kgmid
+# /g/1hm3p1sxt, ...!3d12.9942605!4d77.5392937). Anchor the map + directions to
+# these exact coordinates, NOT a business-name text search: the Google listing is
+# named "Reid & Taylor", so a "BespokeStudio, <address>" query fails to match and
+# Google drifts the pin off the shopfront. Coordinates pin it precisely.
+PIN_LATLNG = "%s,%s" % (BIZ["lat"], BIZ["lng"])   # -> "12.9942605,77.5392937"
+DIRECTIONS_URL = "https://www.google.com/maps/dir/?api=1&destination=" + quote(PIN_LATLNG)
+MAP_EMBED_URL = "https://www.google.com/maps?q=" + quote(PIN_LATLNG) + "&output=embed&z=17"
 
 # --- Google reviews (REAL). Reviews are fetched LIVE in the browser, never
 # baked into the HTML (Google Places policy forbids caching review content).
